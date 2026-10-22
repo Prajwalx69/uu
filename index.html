@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080c16">
+<title>Prajwal Cam</title>
+<style>
+:root{color-scheme:dark;--bg:#080c16;--panel:#111827;--line:#29364d;--muted:#9caac0;--text:#f5f7ff;--blue:#728cff;--cyan:#55d9e8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#192744,var(--bg) 60%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:18px 13px 35px}header{display:flex;gap:11px;align-items:center;margin:4px 0 20px}.logo{height:43px;width:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--cyan));font-size:23px;font-weight:900;color:#07101b}h1{font-size:26px;margin:0;letter-spacing:-.7px}.sub{color:var(--muted);font-size:12px;margin-top:2px}.layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.8fr);gap:14px}.card{border:1px solid var(--line);border-radius:20px;background:#101726f2;overflow:hidden;box-shadow:0 18px 50px #0003}.head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.status{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:#68748a}.dot.live{background:#39e79b;box-shadow:0 0 12px #39e79b99}.stage{aspect-ratio:16/10;background:#080d18;display:grid;place-items:center;position:relative;overflow:hidden}.stage video{width:100%;height:100%;object-fit:cover;display:none}.stage video.show{display:block}.stage #local{transform:scaleX(-1)}.placeholder{text-align:center;padding:24px;color:var(--muted);font-size:13px;line-height:1.5}.cam{font-size:34px;margin-bottom:10px}.placeholder strong{display:block;color:#f1f4fc;font-size:16px;margin-bottom:5px}.buttons{display:flex;gap:8px;flex-wrap:wrap;padding:14px}button{border:0;border-radius:11px;padding:12px 14px;font-size:13px;font-weight:750;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(100deg,var(--blue),#8a7cff);color:white;flex:1}.secondary{background:#202b40;color:#e8eef9;border:1px solid #34425c}.danger{background:#3a202c;color:#ffbec9;border:1px solid #623548}.msg{padding:0 16px 15px;min-height:20px;color:#b9c6da;font-size:12px;line-height:1.55}.side{padding:18px}.side h2{font-size:17px;margin:0 0 8px}.desc{font-size:13px;line-height:1.55;color:var(--muted);margin:0 0 14px}.pill{display:inline-block;border:1px solid #31415d;background:#172238;color:#d0dcf0;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:800;margin-bottom:14px}.field{width:100%;min-width:0;background:#0a1020;border:1px solid #303d55;border-radius:10px;padding:11px;color:#e4ecfa;font-size:12px}.row{display:flex;gap:7px;margin:9px 0}.row button{padding:0 12px}.full{width:100%}.note{margin-top:14px;padding:12px;background:#171f30;border:1px solid #2c3951;border-radius:12px;font-size:12px;line-height:1.6;color:#b6c3d7}.note strong{color:white}.hidden{display:none!important}.small{font-size:11px;color:var(--muted);line-height:1.55;margin-top:13px}body.viewer .broadcastOnly{display:none!important}body:not(.viewer) .viewerOnly{display:none!important}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.wrap{padding:15px 10px 28px}.stage{aspect-ratio:4/3}.side{padding:16px}h1{font-size:24px}}
+
+/* Viewer URL: camera-only fullscreen view */
+body.viewer{background:#000;min-height:100dvh;overflow:hidden}
+body.viewer .wrap{width:100%;max-width:none;height:100dvh;min-height:100dvh;margin:0;padding:0}
+body.viewer header,
+body.viewer aside,
+body.viewer .head,
+body.viewer .viewerOnly,
+body.viewer .msg{display:none!important}
+body.viewer .layout{display:block;width:100%;height:100%}
+body.viewer section.card{width:100%;height:100%;min-height:100dvh;border:0;border-radius:0;box-shadow:none;background:#000}
+body.viewer .stage{width:100%;height:100%;min-height:100dvh;aspect-ratio:auto;background:#000;display:block}
+body.viewer #remote{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+body.viewer #placeholder{display:none!important}
+
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><div class="logo">P</div><div><h1>Prajwal Cam</h1><div class="sub">Phone camera for PRISM Live</div></div></header>
+<div class="layout">
+<section class="card">
+<div class="head"><div class="status"><span class="dot" id="dot"></span><span id="status">Ready</span></div><div class="sub" id="mode">Broadcaster</div></div>
+<div class="stage">
+<video id="local" autoplay playsinline muted></video>
+<video id="remote" autoplay playsinline muted></video>
+<div class="placeholder" id="placeholder"><div class="cam">📷</div><strong id="phTitle">Prajwal Cam</strong><span id="phText">Start camera on this device, or open a viewer link.</span></div>
+</div>
+<div class="buttons broadcastOnly"><button class="primary" id="start">▶ Start Camera</button><button class="danger" id="stop" disabled>■ Stop</button></div>
+<div class="buttons viewerOnly"><button class="primary" id="reconnect">↻ Connect / Retry</button></div>
+<div class="msg" id="message" role="status" aria-live="polite">Starting connection service…</div>
+</section>
+<aside class="card side">
+<div class="broadcastOnly">
+<div class="pill">● CAMERA DEVICE</div><h2>Viewer / PRISM URL</h2>
+<p class="desc">Start the camera, copy the viewer URL, then open it in Chrome on another device or add it as a PRISM Web source.</p>
+<div class="row"><input class="field" id="link" readonly placeholder="Waiting for connection ID"><button class="secondary" id="copy">Copy</button></div>
+<button class="secondary full" id="share">↗ Share viewer link</button>
+</div>
+<div class="viewerOnly"><div class="pill">● VIEWER</div><h2>Live camera receiver</h2><p class="desc">Keep the camera device online with the camera started. For PRISM, use this full viewer URL as the Web source.</p></div>
+<div class="note"><strong>Connection note</strong><br>This uses PeerJS Cloud for signaling and WebRTC for video. Direct connections may fail on some networks without a TURN relay. This page has not been verified inside every PRISM app/browser version.</div>
+<div class="small">Use HTTPS hosting. Camera access needs browser permission. Share the viewer link only with people you trust. Stop camera when finished.</div>
+</aside>
+</div>
+</main>
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script>
+(() => {
+ const $=id=>document.getElementById(id), q=new URLSearchParams(location.search);
+ const isViewer=q.has('view'); document.body.classList.toggle('viewer',isViewer);
+ $('mode').textContent=isViewer?'Viewer':'Broadcaster';
+ let peer=null,stream=null,call=null,ownId=null,opened=false,dummyStream=null;
+ function say(s){$('message').textContent=s}
+ function status(s,live=false){$('status').textContent=s;$('dot').classList.toggle('live',live)}
+ function hideVideos(){['local','remote'].forEach(id=>{$(id).srcObject=null;$(id).classList.remove('show')});$('placeholder').hidden=false}
+ function closeCall(){if(call){try{call.close()}catch{}call=null}if(dummyStream){dummyStream.getTracks().forEach(t=>t.stop());dummyStream=null}}
+ function makeLink(){if(!ownId)return;let u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('view',ownId);$('link').value=u.href}
+ function initPeer(){
+   if(!window.Peer){say('PeerJS could not load. Check internet and refresh.');return}
+   peer=new Peer(undefined,{debug:1,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}});
+   peer.on('open',id=>{opened=true;if(isViewer){status('Connecting');connect(q.get('view'))}else{ownId=id;status('Ready');makeLink();say('Ready. Press Start Camera, then copy the viewer URL.')}});
+   peer.on('call',incoming=>{if(isViewer)return;if(!stream){incoming.close();return}closeCall();call=incoming;incoming.answer(stream);incoming.on('error',e=>say('Call error: '+e.message));});
+   peer.on('error',e=>{console.error(e);if(e.type==='peer-unavailable')say('Camera device is offline or camera has not started. Keep it open and retry.');else say('Connection issue: '+(e.message||e.type)+'. Check internet and refresh.')});
+   peer.on('disconnected',()=>{status('Signaling offline');say('Signaling disconnected. Refresh this page to reconnect.')});
+ }
+ async function start(){
+  if(!navigator.mediaDevices?.getUserMedia){say('Camera access requires a secure HTTPS website. Publish this page to a static HTTPS host first.');return}
+  $('start').disabled=true;say('Waiting for camera permission…');
+  try{
+   stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:false});
+   $('local').srcObject=stream;$('local').classList.add('show');$('placeholder').hidden=true;
+   status('Camera live',true);$('stop').disabled=false;say('Camera running. Copy the viewer URL and open it on the other phone.');
+   stream.getVideoTracks()[0].addEventListener('ended',stop,{once:true});
+  }catch(e){let m='Could not start camera: '+(e.message||e.name);if(e.name==='NotAllowedError')m='Camera permission denied. Allow camera access in browser settings.';if(e.name==='NotFoundError')m='No camera was found.';if(e.name==='NotReadableError')m='Camera is being used by another app.';say(m)}
+  finally{$('start').disabled=false}
+ }
+ function stop(){closeCall();if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}hideVideos();status('Camera off');$('stop').disabled=true;say('Camera stopped. Video sharing ended.')}
+ function makeDummyVideoStream(){
+  // PeerJS needs an outgoing track to create a media offer. Send a tiny blank canvas track;
+  // the broadcaster sends the actual camera stream back to this viewer.
+  const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;
+  const ctx=canvas.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,2,2);
+  if(!canvas.captureStream) throw new Error('This browser does not support canvas video capture. Open the viewer in Chrome.');
+  return canvas.captureStream(1);
+ }
+ function connect(id){
+  if(!id){say('Missing camera ID. Open the exact viewer URL copied from the camera device.');return}
+  if(!peer||!peer.open){say('Waiting for signaling connection…');try{peer?.reconnect()}catch{}return}
+  closeCall();status('Connecting');say('Connecting to camera device…');
+  try {
+   dummyStream=makeDummyVideoStream();
+   const c=peer.call(id,dummyStream);if(!c){say('Could not start call. Tap Connect / Retry.');return}call=c;
+   c.on('stream',s=>{$('remote').srcObject=s;$('remote').classList.add('show');$('placeholder').hidden=true;status('Live',true);say('Connected. Live camera received.');$('remote').play().catch(()=>{})});
+   c.on('close',()=>{hideVideos();status('Disconnected');say('Stream ended. Keep camera running on the camera device and retry.');if(dummyStream){dummyStream.getTracks().forEach(t=>t.stop());dummyStream=null}});
+   c.on('error',e=>{status('Failed');say('Video connection failed: '+(e.message||e.type)+'. Check camera is started and both phones have internet; some networks need a relay.')});
+  } catch(e){status('Failed');say('Could not start viewer: '+e.message)}
+ }
+ $('start').addEventListener('click',start);$('stop').addEventListener('click',stop);
+ $('reconnect').addEventListener('click',()=>connect(q.get('view')));
+ $('copy').addEventListener('click',async()=>{let v=$('link').value;if(!v){say('Wait for the link to generate.');return}try{await navigator.clipboard.writeText(v);say('Viewer link copied.')}catch{$('link').select();say('Select and copy the URL manually.')}});
+ $('share').addEventListener('click',async()=>{let v=$('link').value;if(!v){say('Wait for the link to generate.');return}if(navigator.share){try{await navigator.share({title:'Prajwal Cam',text:'Open this link to view my live camera',url:v})}catch(e){if(e.name!=='AbortError')say('Could not share. Use Copy instead.')}}else $('copy').click()});
+ window.addEventListener('pagehide',()=>{closeCall();if(stream)stream.getTracks().forEach(t=>t.stop());if(peer)peer.destroy()});
+ if(isViewer){$('phTitle').textContent='Waiting for live camera';$('phText').textContent='Start the camera on the other phone, then tap Connect / Retry.'}
+ initPeer();
+})();
+</script>
+</body>
+</html>
